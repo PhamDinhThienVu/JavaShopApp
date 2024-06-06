@@ -30,6 +30,8 @@ public class CategoryController {
             @RequestBody
             CategoryDTO categoryDTO,
             BindingResult result){
+
+        //Get all error messages and return break
         if(result.hasErrors()){
             List<String> errorMessages = result.getFieldErrors()
                     .stream()
@@ -37,6 +39,7 @@ public class CategoryController {
                     .toList();
             return ResponseEntity.badRequest().body(errorMessages);
         }
+
         return ResponseEntity.ok("This is insertCategory" + categoryDTO.toString());
     }
 
