@@ -25,7 +25,7 @@ import java.util.*;
 
 
 @RestController
-@RequestMapping("api/v1/products")
+@RequestMapping("${api.prefix}/products")
 public class ProductController {
 
     //GET Method to get - ALL Products
