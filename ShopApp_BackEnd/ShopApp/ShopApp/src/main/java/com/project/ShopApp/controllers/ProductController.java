@@ -21,17 +21,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-
+import java.util.*;
 
 
 @RestController
 @RequestMapping("api/v1/products")
 public class ProductController {
-    //Get all product
+
+    //GET Method to get - ALL Products
     @GetMapping("") //http://localhost:8088/api/v1/products?page=1&limit=10
     public ResponseEntity<String> getProducts(
             @RequestParam("page") int page,
@@ -40,7 +37,7 @@ public class ProductController {
         return ResponseEntity.ok("Get products here!");
     }
 
-    //Get a product
+    //GET METHOD - To get a product with id
     @GetMapping("/{id}") //http://localhost:8088/api/v1/categories?page=1&limit=10
     public ResponseEntity<String> getProductById(@PathVariable Long id)
     {
@@ -68,33 +65,42 @@ public class ProductController {
                 return ResponseEntity.badRequest().body(errorMessages);
             }
 
-            //Get file from objects
-            MultipartFile file = productDTO.getFile();
-
-
-            //Check image file if null
-            if(file == null){
-                return ResponseEntity.badRequest().body("File is null!");
+            //Get files from objects
+            List<MultipartFile> files = productDTO.getFiles();
+            //Check if file is null, to prevent exception
+            if(files == null){
+                files = new ArrayList<MultipartFile>();
             }
 
-            //Check image if too large
-            if(file.getSize() > 10 * 1024 * 1024){
-                return ResponseEntity.badRequest().body("File is too large!");
+            for (MultipartFile file : files) {
+                //Check image file if null
+                if(file == null){
+                    return ResponseEntity.badRequest().body("File is null!");
+                }
+
+                //Check image if image size = 0
+                if(file.getSize() == 0){
+                    return ResponseEntity.badRequest().body("What was what!??");
+                }
+
+                //Check image if too large
+                if(file.getSize() > 10 * 1024 * 1024){
+                    return ResponseEntity.badRequest().body("File is too large!");
+                }
+
+                //Check if wrong extension
+                if (!isImageFile(file)) {
+                    return ResponseEntity.badRequest().body("File must be an image!");
+                }
+                //Execute store the file
+                String fileName = this.storeFile(file);
             }
-
-            //Check if wrong extension
-            if (!isImageFile(file)) {
-                return ResponseEntity.badRequest().body("File must be an image!");
-            }
-
-
-            //Execute store the file
-            String fileName = this.storeFile(file);
 
             //Save object to DB
 
             //Return response
             return ResponseEntity.ok().body("Create a new product successfully!");
+
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -114,7 +120,7 @@ public class ProductController {
     public String storeFile(MultipartFile file) throws IOException {
         String filename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
         //Add UUID before fileName to make this file unique, not duplicate with another file
-        String uniqueFileName = UUID.randomUUID().toString() + "_" + filename;
+        String uniqueFileName = UUID.randomUUID() + "_" + filename;
         // The dir path to save file
         java.nio.file.Path uploadDir = Paths.get("uploads");
         //Check, create the folder "uploads" if it doesn't exist

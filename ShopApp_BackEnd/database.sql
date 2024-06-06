@@ -64,10 +64,21 @@ CREATE TABLE products(
     updated_at TIMESTAMP,
     category_id INT,
     FOREIGN KEY (category_id) REFERENCES categories(id)
-)
+);
+
+CREATE TABLE product_images(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    product_id INT,
+    FOREIGN KEY (product_id) REFERENCES products(id),
+    CONSTRAINT fk_product_images_product_id
+        FOREIGN KEY (product_id)
+        REFERENCES products (id) ON DELETE CASCADE,
+    image_url VARCHAR(255)
+
+);
 
 --Oders
-CREATE TABLE oders(
+CREATE TABLE orders(
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id int,
     FOREIGN KEY (user_id) REFERENCES users(id),
@@ -80,15 +91,15 @@ CREATE TABLE oders(
     `status` VARCHAR(20),
     total_money FLOAT CHECK(total_money >= 0)
 );
-ALTER TABLE oders ADD COLUMN `shipping_method` VARCHAR(100);
-ALTER TABLE oders ADD COLUMN `shipping_address` VARCHAR(100);
-ALTER TABLE oders ADD COLUMN `shipping_date` VARCHAR(100);
-ALTER TABLE oders ADD COLUMN `tracking_number` VARCHAR(100);
-ALTER TABLE oders ADD COLUMN `payment_method` VARCHAR(100);
+ALTER TABLE orders ADD COLUMN `shipping_method` VARCHAR(100);
+ALTER TABLE orders ADD COLUMN `shipping_address` VARCHAR(100);
+ALTER TABLE orders ADD COLUMN `shipping_date` VARCHAR(100);
+ALTER TABLE orders ADD COLUMN `tracking_number` VARCHAR(100);
+ALTER TABLE orders ADD COLUMN `payment_method` VARCHAR(100);
 --Xoa 1 don hang => xoa mem => them truong active
-ALTER TABLE oders ADD COLUMN active TINYINT(1);
+ALTER TABLE orders ADD COLUMN active TINYINT(1);
 --Trang thai don hang chi duoc cac gia tri cu the sau
-ALTER TABLE oders
+ALTER TABLE orders
 MODIFY COLUMN status ENUM('pending','processing', 'shipped', 'delivered', 'cancelled')
 COMMENT "Cac trang thai cua don hang";
 
@@ -105,5 +116,5 @@ CREATE TABLE order_details(
     color VARCHAR(20) DEFAULT ''
 );
 
-ALTER TABLE order_details ADD FOREIGN KEY (order_id) REFERENCES oders(id);
+ALTER TABLE order_details ADD FOREIGN KEY (order_id) REFERENCES orders(id);
 ALTER TABLE order_details ADD FOREIGN KEY (product_id) REFERENCES products(id);
