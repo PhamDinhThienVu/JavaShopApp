@@ -85,7 +85,7 @@ CREATE TABLE orders(
     fullname VARCHAR(100),
     email VARCHAR(100),
     phone_number VARCHAR(20) NOT NULL,
-    address VARCHAR(200) NOT NULL,
+    `address` VARCHAR(200) NOT NULL,
     note VARCHAR(100) DEFAULT '',
     order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     `status` VARCHAR(20),
