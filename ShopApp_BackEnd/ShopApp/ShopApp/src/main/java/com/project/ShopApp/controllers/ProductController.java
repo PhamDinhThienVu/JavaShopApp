@@ -21,7 +21,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 
@@ -47,36 +49,17 @@ public class ProductController {
 
 
 
-    //Insert a product
-//    @PostMapping("")
-//    public  ResponseEntity<?> insertProduct(
-//            @Valid
-//            @RequestBody
-//            ProductDTO productDTO,
-//            BindingResult result){
-//        try{
-//            if(result.hasErrors()){
-//                List<String> errorMessages = result.getFieldErrors()
-//                        .stream()
-//                        .map(FieldError::getDefaultMessage)
-//                        .toList();
-//                return ResponseEntity.badRequest().body(errorMessages);
-//            }
-//            return ResponseEntity.ok("This is insertCategory" + productDTO.toString());
-//        }catch(Exception e){
-//            return ResponseEntity.badRequest().body(e.getMessage());
-//        }
-//    }
 
 
-
-    @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public  ResponseEntity<?> insertProduct(
-            @Valid @RequestBody
+    @PostMapping(value = "",  consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> createProduct(
+            @Valid
+            @ModelAttribute
             ProductDTO productDTO,
-            //@RequestPart("file") MultipartFile file,
-            BindingResult result){
+            BindingResult result
+    ){
         try{
+            //Get all error messages and return break
             if(result.hasErrors()){
                 List<String> errorMessages = result.getFieldErrors()
                         .stream()
@@ -85,47 +68,70 @@ public class ProductController {
                 return ResponseEntity.badRequest().body(errorMessages);
             }
 
+            //Get file from objects
             MultipartFile file = productDTO.getFile();
-            if(file != null){
-                //Kiểm tra kích thước và định dạng
-                if(file.getSize() > 10 * 1024 * 1024){
-//            throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE, "File is too large");
-                    return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body("File is too large");
-                }
-                String contentType = file.getContentType();
-                //Kiểm tra định dạng file
-//                if(contentType == null || !contentType.startsWith("image/")){
-//
-//                    return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE
-//                    ).body("File must be an image!");
-//                }
-                String  filename = this.storeFile(file);
 
+
+            //Check image file if null
+            if(file == null){
+                return ResponseEntity.badRequest().body("File is null!");
             }
-            return ResponseEntity.ok("This is insertProduct" + productDTO.toString());
+
+            //Check image if too large
+            if(file.getSize() > 10 * 1024 * 1024){
+                return ResponseEntity.badRequest().body("File is too large!");
+            }
+
+            //Check if wrong extension
+            if (!isImageFile(file)) {
+                return ResponseEntity.badRequest().body("File must be an image!");
+            }
+
+
+            //Execute store the file
+            String fileName = this.storeFile(file);
+
+            //Save object to DB
+
+            //Return response
+            return ResponseEntity.ok().body("Create a new product successfully!");
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+    private boolean isImageFile(MultipartFile file) {
+        // Check content type (more reliable)
+        if (file.getContentType() != null && file.getContentType().startsWith("image/")) {
+            return true;
+        }
 
-
-
-    //Néu tham số truyền vào là một đối tượng => Dât Tràner Object = Request Object
-    private String storeFile(MultipartFile file) throws IOException{
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-
-        String uniqueFilename = UUID.randomUUID().toString() + "_" + fileName;
-
+        // Check file extension (less reliable)
+        String fileName = file.getOriginalFilename();
+        assert fileName != null;
+        String extension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+        return Arrays.asList("jpg", "jpeg", "png", "gif").contains(extension);
+    }
+    public String storeFile(MultipartFile file) throws IOException {
+        String filename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
+        //Add UUID before fileName to make this file unique, not duplicate with another file
+        String uniqueFileName = UUID.randomUUID().toString() + "_" + filename;
+        // The dir path to save file
         java.nio.file.Path uploadDir = Paths.get("uploads");
+        //Check, create the folder "uploads" if it doesn't exist
         if(!Files.exists(uploadDir)){
             Files.createDirectories(uploadDir);
         }
-
-        java.nio.file.Path destination = Paths.get(uploadDir.toString(), uniqueFilename);
-
-        Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
-        return uniqueFilename;
+        //Get the file path in the dir
+        java.nio.file.Path destinatioin = Paths.get(uploadDir.toString(), uniqueFileName);
+        //Copy the file to the folder uploads
+        Files.copy(file.getInputStream(), destinatioin, StandardCopyOption.REPLACE_EXISTING);
+        return uniqueFileName;
     }
+
+
+
+
+
 
     //Update a product
     @PutMapping("/{id}")
