@@ -13,12 +13,21 @@
   - Java (JDK17)
   - Springboot
   - JPA
+  - Spring Security
+  - API from Angular to SpringBoot Backend
 - Architecture:
   - Updated later ...
 ![alt text](DOCS/SystemArchitecture.png)
 ---
 ## Enviroment, IDE, etc...
+- Visual Studio Code
+- IntelliJ
+- Postman
+- Google Chrome
+- XAMP
+
 
 ---
 ## Step by step guild
+- Update later!
 
