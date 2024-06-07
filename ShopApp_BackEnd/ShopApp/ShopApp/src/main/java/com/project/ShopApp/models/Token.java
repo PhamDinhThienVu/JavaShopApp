@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 
 
 
+@Entity
 @Table(name = "tokens")
 @Data
 @Getter
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
 public class Token {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private  long id;
+    private Long id;
 
     @Column(name = "token", length = 255)
     private String token;

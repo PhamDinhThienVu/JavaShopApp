@@ -6,7 +6,7 @@ import lombok.*;
 import java.util.Date;
 
 
-
+@Entity
 @Table(name = "users")
 @Getter
 @Setter
@@ -15,7 +15,7 @@ import java.util.Date;
 public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private  long id;
+    private Long id;
 
     @Column(name = "fullname", length = 100)
     private String fullName;

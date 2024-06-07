@@ -3,6 +3,8 @@ package com.project.ShopApp.models;
 import jakarta.persistence.*;
 import lombok.*;
 
+
+@Entity
 @Table(name = "product_images")
 @Data
 @Getter
@@ -12,7 +14,7 @@ import lombok.*;
 public class ProductImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private  long id;
+    private  Long id;
 
     @ManyToOne
     @JoinColumn(name = "product_id")

@@ -5,6 +5,8 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+
+@Entity
 @Table(name = "orders")
 @Data
 @Getter
@@ -14,7 +16,7 @@ import java.time.LocalDateTime;
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private  long id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

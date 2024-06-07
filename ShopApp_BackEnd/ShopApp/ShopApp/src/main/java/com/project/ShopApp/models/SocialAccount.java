@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 
+@Entity
 @Table(name = "social_accounts")
 @Data
 @Getter
@@ -13,7 +14,7 @@ import lombok.*;
 public class SocialAccount {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private  long id;
+    private Long id;
 
     @Column(name = "provider", nullable = true, length = 20)
     private String provider;

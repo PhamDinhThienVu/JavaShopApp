@@ -1,11 +1,9 @@
 package com.project.ShopApp.models;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
+@Entity
 @Table(name = "roles")
 @Data
 @Getter
@@ -15,5 +13,5 @@ import lombok.*;
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private  long id;
+    private Long id;
 }

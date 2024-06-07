@@ -4,6 +4,7 @@ package com.project.ShopApp.models;
 import jakarta.persistence.*;
 import lombok.*;
 
+@Entity
 @Table(name = "order_details")
 @Data
 @Getter
@@ -13,7 +14,7 @@ import lombok.*;
 public class OrderDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private  long id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "order_id")
