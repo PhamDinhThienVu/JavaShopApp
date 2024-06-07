@@ -11,6 +11,7 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class ProductImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

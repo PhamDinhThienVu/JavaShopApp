@@ -3,7 +3,10 @@ package com.project.ShopApp.controllers;
 
 import com.project.ShopApp.dtos.UserDTO;
 import com.project.ShopApp.dtos.UserLoginDTO;
+import com.project.ShopApp.services.IUserService;
+import com.project.ShopApp.services.UserService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -17,8 +20,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("${api.prefix}/users")
+@RequiredArgsConstructor
 public class UserController {
 
+    private final IUserService userService;
 
     @PostMapping(value = "/register")
     public ResponseEntity<?> createUser(
