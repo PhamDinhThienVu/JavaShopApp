@@ -1,10 +1,17 @@
 package com.project.ShopApp.controllers;
 
-import ch.qos.logback.core.util.StringUtil;
-import com.project.ShopApp.dtos.CategoryDTO;
+import com.project.ShopApp.Response.ProductListResponse;
+import com.project.ShopApp.Response.ProductResponse;
 import com.project.ShopApp.dtos.ProductDTO;
+import com.project.ShopApp.dtos.ProductImageDTO;
+import com.project.ShopApp.models.Product;
+import com.project.ShopApp.models.ProductImage;
+import com.project.ShopApp.services.IProductService;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -12,13 +19,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.io.File;
-import java.io.IOError;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
@@ -26,33 +29,16 @@ import java.util.*;
 
 @RestController
 @RequestMapping("${api.prefix}/products")
+@RequiredArgsConstructor
 public class ProductController {
 
-    //GET Method to get - ALL Products
-    @GetMapping("") //http://localhost:8088/api/v1/products?page=1&limit=10
-    public ResponseEntity<String> getProducts(
-            @RequestParam("page") int page,
-            @RequestParam("limit") int limit
-    ){
-        return ResponseEntity.ok("Get products here!");
-    }
-
-    //GET METHOD - To get a product with id
-    @GetMapping("/{id}") //http://localhost:8088/api/v1/categories?page=1&limit=10
-    public ResponseEntity<String> getProductById(@PathVariable Long id)
-    {
-        return ResponseEntity.ok("Get products " + id);
-    }
+    private final IProductService productService;
 
 
 
-
-
-    @PostMapping(value = "",  consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "")
     public ResponseEntity<?> createProduct(
-            @Valid
-            @ModelAttribute
-            ProductDTO productDTO,
+            @Valid @RequestBody ProductDTO productDTO,
             BindingResult result
     ){
         try{
@@ -64,14 +50,32 @@ public class ProductController {
                         .toList();
                 return ResponseEntity.badRequest().body(errorMessages);
             }
+            Product newProduct = productService.createProduct(productDTO);
+            //Return response
+            return ResponseEntity.ok(newProduct);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
-            //Get files from objects
-            List<MultipartFile> files = productDTO.getFiles();
+
+    @PostMapping(value = "uploads/{id}",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> uploadImages(
+            @PathVariable("id") Long productId,
+            @ModelAttribute("files") List<MultipartFile> files
+    ){
+        try{
+//Get productExisting
             //Check if file is null, to prevent exception
+
+            if(files.size() > 5){
+                return ResponseEntity.badRequest().body("You just can upload less than or equal 5 images!");
+            }
             if(files == null){
                 files = new ArrayList<MultipartFile>();
             }
-
+            List<ProductImageDTO> productImages = new ArrayList<ProductImageDTO>();
             for (MultipartFile file : files) {
                 //Check image file if null
                 if(file == null){
@@ -94,13 +98,15 @@ public class ProductController {
                 }
                 //Execute store the file
                 String fileName = this.storeFile(file);
+
+                //Save images of product to DB
+                ProductImageDTO productImageDTO = ProductImageDTO.builder()
+                        .image_url(fileName)
+                        .build();
+                productService.createProductImage(productId, productImageDTO);
+                productImages.add(productImageDTO);
             }
-
-            //Save object to DB
-
-            //Return response
-            return ResponseEntity.ok().body("Create a new product successfully!");
-
+            return ResponseEntity.ok(productImages);
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -117,7 +123,7 @@ public class ProductController {
         String extension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
         return Arrays.asList("jpg", "jpeg", "png", "gif").contains(extension);
     }
-    public String storeFile(MultipartFile file) throws IOException {
+    private String storeFile(MultipartFile file) throws IOException {
         String filename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
         //Add UUID before fileName to make this file unique, not duplicate with another file
         String uniqueFileName = UUID.randomUUID() + "_" + filename;
@@ -133,6 +139,48 @@ public class ProductController {
         Files.copy(file.getInputStream(), destinatioin, StandardCopyOption.REPLACE_EXISTING);
         return uniqueFileName;
     }
+
+
+    //GET Method to get - ALL Products
+    @GetMapping("") //http://localhost:8088/api/v1/products?page=1&limit=10
+    public ResponseEntity<?> getProducts(
+            @RequestParam("page") int page,
+            @RequestParam("limit") int limit
+    ){
+        PageRequest pageRequest = PageRequest.of(
+                page, limit,
+                Sort.by("createdAt").descending());
+
+
+        Page<ProductResponse> productPage = productService.getAllProducts(pageRequest);
+        int totalPages = productPage.getTotalPages();
+
+
+        List<ProductResponse> products = productPage.getContent();
+        int total_products = products.size();
+
+        return ResponseEntity.ok(ProductListResponse.builder()
+                        .products(products)
+                        .total_pages(totalPages)
+                        .total_products(total_products)
+                .build());
+    }
+
+    //GET METHOD - To get a product with id
+    @GetMapping("/{id}") //http://localhost:8088/api/v1/categories?page=1&limit=10
+    public ResponseEntity<?> getProductById(@PathVariable Long id)
+    {
+        return ResponseEntity.ok(productService.getProductById(id));
+    }
+
+
+
+
+
+
+
+
+
 
 
 
