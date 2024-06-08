@@ -1,5 +1,6 @@
 package com.project.ShopApp.controllers;
 
+import com.github.javafaker.Faker;
 import com.project.ShopApp.Response.ProductListResponse;
 import com.project.ShopApp.Response.ProductResponse;
 import com.project.ShopApp.dtos.ProductDTO;
@@ -151,7 +152,6 @@ public class ProductController {
                 page, limit,
                 Sort.by("createdAt").descending());
 
-
         Page<ProductResponse> productPage = productService.getAllProducts(pageRequest);
         int totalPages = productPage.getTotalPages();
 
@@ -170,32 +170,76 @@ public class ProductController {
     @GetMapping("/{id}") //http://localhost:8088/api/v1/categories?page=1&limit=10
     public ResponseEntity<?> getProductById(@PathVariable Long id)
     {
-        return ResponseEntity.ok(productService.getProductById(id));
+        try {
+            ProductResponse existingProduct = ProductResponse.fromProduct(productService.getProductById(id));
+            return ResponseEntity.ok(existingProduct);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     //Update a product
     @PutMapping("/{id}")
-    public  ResponseEntity<String> updateProduct(@PathVariable Long id){
-        return ResponseEntity.ok("This is Update Product: id = " + id);
+    public  ResponseEntity<?> updateProduct(
+            @PathVariable Long id,
+            @RequestBody ProductDTO productDTO
+    ){
+        try {
+            Product updatedProduct = productService.updateProduct(id, productDTO);
+            return ResponseEntity.ok(updatedProduct);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     //Delete a product
     @DeleteMapping("/{id}")
     public  ResponseEntity<String> deleteProduct(@PathVariable Long id){
-        return ResponseEntity.ok("This is delete product: id = " + id);
+        try {
+            productService.deleteProduct(id);
+            return ResponseEntity.ok("This is Deleted Product: id = " + id);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
+
+
+    @PostMapping("/generateFakeProducts")
+    public ResponseEntity<?> generateFakeProducts(){
+        Faker faker = new Faker();
+        for(int i = 0; i < 100000; i++){
+
+            String productName = faker.commerce().productName();
+
+
+
+            //Check data
+            if(productService.existsByName(productName)){
+                continue;
+            }
+
+
+            //Create
+            ProductDTO productDTO  = ProductDTO.builder()
+                    .name(productName)
+                    .price((float) faker.number().numberBetween(10,10000000))
+                    .thumbnail("")
+                    .description(faker.lorem().sentence())
+                    .categoryId((long)faker.number().numberBetween(2,3))
+                    .build();
+
+            //Save
+            try{
+                productService.createProduct(productDTO);
+            }catch (Exception e){
+                return ResponseEntity.badRequest().body(e.getMessage());
+            }
+
+        }
+
+        return ResponseEntity.ok("Fake Product Generator");
+    }
+
+
 }
