@@ -2,21 +2,26 @@ package com.project.ShopApp.controllers;
 
 
 import com.project.ShopApp.dtos.OrderDTO;
+import com.project.ShopApp.response.OrderResponse;
+import com.project.ShopApp.services.IOrderService;
+import com.project.ShopApp.services.OrderService;
 import jakarta.validation.Valid;
-import org.springframework.core.annotation.Order;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
+
 @RestController
 @RequestMapping("${api.prefix}/orders")
+@RequiredArgsConstructor
 public class OrderController {
 
+    private final IOrderService orderService;
 
     @PostMapping("")
-    public ResponseEntity<String> addOrder(
+    public ResponseEntity<?> addOrder(
             @Valid
             @RequestBody
             OrderDTO orderDTO,
@@ -27,7 +32,10 @@ public class OrderController {
                 List<String> errorMessages = result.getFieldErrors().stream().map(FieldError::getDefaultMessage).toList();
                 return ResponseEntity.badRequest().body(errorMessages.toString());
             }
-            return ResponseEntity.ok("Create order successfully!" + orderDTO.toString());
+
+            OrderResponse orderResponse =  orderService.createOrder(orderDTO);
+
+            return ResponseEntity.ok(orderResponse);
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }

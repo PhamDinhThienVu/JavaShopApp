@@ -1,4 +1,4 @@
-package com.project.ShopApp.dtos;
+package com.project.ShopApp.response;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;

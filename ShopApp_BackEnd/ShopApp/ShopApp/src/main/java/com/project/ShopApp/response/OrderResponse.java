@@ -1,23 +1,23 @@
-package com.project.ShopApp.dtos;
+package com.project.ShopApp.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.project.ShopApp.models.User;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+import org.springframework.cglib.core.Local;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Date;
 
-@Data//toString
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderDTO {
-    @Min(value = 1, message = "User is not equal 0")
+@Builder
+public class OrderResponse{
+    private Long id;
+
+
     @JsonProperty("user_id")
     private  Long userId;
 
@@ -27,7 +27,7 @@ public class OrderDTO {
     @JsonProperty("email")
     private  String email;
 
-    @NotBlank(message = "Please provide your phone number!")
+
     @JsonProperty("phone_number")
     private String phoneNumber;
 
@@ -38,14 +38,13 @@ public class OrderDTO {
     @JsonProperty("note")
     private String note;
 
-    @Min(value = 0, message = "Total money must be >= 0")
+
     @JsonProperty("total_money")
     private double totalMoney;
 
 
     @JsonProperty("order_date")
     private LocalDate orderDate;
-
 
     @JsonProperty("shipping_method")
     private String shippingMethod;
@@ -55,7 +54,6 @@ public class OrderDTO {
 
     @JsonProperty("shipping_date")
     private LocalDate shippingDate;
-
 
 
 
@@ -77,7 +75,4 @@ public class OrderDTO {
 
     @JsonProperty("is_active")
     private boolean is_active;
-
-
-
 }

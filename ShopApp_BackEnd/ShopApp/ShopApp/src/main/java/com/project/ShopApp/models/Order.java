@@ -1,9 +1,12 @@
 package com.project.ShopApp.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 
 @Entity
@@ -38,8 +41,6 @@ public class Order {
     @Column(name = "note", length = 100)
     private String note;
 
-    @Column(name = "order_date")
-    private LocalDateTime orderDate;
 
     @Column(name = "status")
     private String status;
@@ -51,10 +52,16 @@ public class Order {
     private String shippingMethod;
 
     @Column(name = "shipping_date")
-    private LocalDateTime shippingDate;
+    private LocalDate shippingDate;
 
-    @Column(name = "tracking_number")
-    private String trackingNumber;
+    @Column(name = "shipping_address")
+    private String shippingAddress;
+
+    @Column(name = "order_date")
+    private LocalDate orderDate;
+
+//    @Column(name = "tracking_number")
+//    private String trackingNumber;
 
     @Column(name = "payment_method")
     private String paymentMethod;
@@ -65,6 +72,6 @@ public class Order {
 //    @Column(name = "payment_date")
 //    private Date paymentDate;
 
-    @Column(name = "active")
-    private boolean active;
+    @Column(name = "is_active")
+    private boolean is_active;
 }

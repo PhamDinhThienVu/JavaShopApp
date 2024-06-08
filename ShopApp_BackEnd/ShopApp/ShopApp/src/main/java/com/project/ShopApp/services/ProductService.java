@@ -1,5 +1,5 @@
 package com.project.ShopApp.services;
-import com.project.ShopApp.Response.ProductResponse;
+import com.project.ShopApp.response.ProductResponse;
 import com.project.ShopApp.dtos.ProductDTO;
 import com.project.ShopApp.dtos.ProductImageDTO;
 import com.project.ShopApp.models.Category;

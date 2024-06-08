@@ -47,5 +47,8 @@ public class UserDTO {
     @NotNull(message = "Can not recognized user role!")
     @JsonProperty("role_id")
     private Long roleId;
+
+    @JsonProperty("is_active")
+    private boolean is_active;
 }
 ;

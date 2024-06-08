@@ -97,7 +97,7 @@ ALTER TABLE orders ADD COLUMN `shipping_date` VARCHAR(100);
 ALTER TABLE orders ADD COLUMN `tracking_number` VARCHAR(100);
 ALTER TABLE orders ADD COLUMN `payment_method` VARCHAR(100);
 --Xoa 1 don hang => xoa mem => them truong active
-ALTER TABLE orders ADD COLUMN active TINYINT(1);
+ALTER TABLE orders ADD COLUMN is_active TINYINT(1);
 --Trang thai don hang chi duoc cac gia tri cu the sau
 ALTER TABLE orders
 MODIFY COLUMN status ENUM('pending','processing', 'shipped', 'delivered', 'cancelled')

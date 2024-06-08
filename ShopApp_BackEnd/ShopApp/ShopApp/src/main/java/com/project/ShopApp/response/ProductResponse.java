@@ -1,15 +1,7 @@
-package com.project.ShopApp.Response;
+package com.project.ShopApp.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.project.ShopApp.dtos.BaseResponse;
 import com.project.ShopApp.models.Product;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.*;
-import  java.util.List;
-import org.springframework.web.multipart.MultipartFile;
 
 
 @Getter

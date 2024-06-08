@@ -1,4 +1,4 @@
-package com.project.ShopApp.Response;
+package com.project.ShopApp.response;
 
 
 import lombok.*;

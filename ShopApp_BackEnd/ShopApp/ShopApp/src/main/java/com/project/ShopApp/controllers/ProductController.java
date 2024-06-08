@@ -1,12 +1,11 @@
 package com.project.ShopApp.controllers;
 
 import com.github.javafaker.Faker;
-import com.project.ShopApp.Response.ProductListResponse;
-import com.project.ShopApp.Response.ProductResponse;
+import com.project.ShopApp.response.ProductListResponse;
+import com.project.ShopApp.response.ProductResponse;
 import com.project.ShopApp.dtos.ProductDTO;
 import com.project.ShopApp.dtos.ProductImageDTO;
 import com.project.ShopApp.models.Product;
-import com.project.ShopApp.models.ProductImage;
 import com.project.ShopApp.services.IProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
