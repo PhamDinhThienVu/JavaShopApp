@@ -2,6 +2,7 @@ package com.project.ShopApp.controllers;
 
 
 import com.project.ShopApp.dtos.OrderDTO;
+import com.project.ShopApp.models.Order;
 import com.project.ShopApp.response.OrderResponse;
 import com.project.ShopApp.services.IOrderService;
 import com.project.ShopApp.services.OrderService;
@@ -22,9 +23,7 @@ public class OrderController {
 
     @PostMapping("")
     public ResponseEntity<?> addOrder(
-            @Valid
-            @RequestBody
-            OrderDTO orderDTO,
+            @Valid @RequestBody OrderDTO orderDTO,
             BindingResult result) {
         try {
 
@@ -42,18 +41,47 @@ public class OrderController {
     }
 
 
+    /*
+     * Get order of a user by user_id
+     *
+     * */
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> gerOrder(
+            @Valid @PathVariable("id") long orderId
+    ) {
+
+        try{
+            OrderResponse orderResponse = orderService.getOrder(orderId);
+            return ResponseEntity.ok(orderResponse);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
+    }
+
 
     /*
     * Get order of a user by user_id
     *
     * */
-    @GetMapping("/{user_id}")
-    public ResponseEntity<?> gerOrders(
-            @Valid @PathVariable("user_id") long userId
-            ) {
-
+    @GetMapping("")
+    public ResponseEntity<?> getOrders() {
         try{
-            return ResponseEntity.ok("Get the orders of a user successfully!");
+            List<OrderResponse> orderResponses = orderService.getAllOrders();
+            return ResponseEntity.ok(orderResponses);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/user/{user_id}")
+    public ResponseEntity<?> gerOrdersOfUser(
+            @Valid @PathVariable("user_id") long userId
+    ) {
+        try{
+            List<OrderResponse> orderResponses = orderService.getAllOrdersOfUser(userId);
+            return ResponseEntity.ok(orderResponses);
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -68,7 +96,13 @@ public class OrderController {
             @Valid @PathVariable long id,
             @Valid @RequestBody OrderDTO orderDTO
     ){
-        return ResponseEntity.ok("Update order successfully!");
+        try{
+            OrderResponse orderResponse = orderService.updateOrder(id, orderDTO);
+            return ResponseEntity.ok(orderResponse);
+        }catch(Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
     }
 
 
@@ -80,8 +114,14 @@ public class OrderController {
             @Valid @PathVariable long id
     ){
         //Update "active" attribute to false
+        try{
+            orderService.deleteOrder(id);
+            return ResponseEntity.ok("Delete order successfully!");
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
 
-        return ResponseEntity.ok("Delete order successfully!");
+
     }
 
 }

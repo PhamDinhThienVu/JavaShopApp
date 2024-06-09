@@ -9,13 +9,14 @@ public interface IOrderService {
 
     OrderResponse createOrder(OrderDTO orderDTO) throws Exception;
 
-    OrderResponse getOrder(Long id);
+    OrderResponse getOrder(Long id) throws Exception;
 
-    OrderResponse updateOrder(Long id, OrderDTO orderDTO);
+    OrderResponse updateOrder(Long id, OrderDTO orderDTO) throws Exception;
 
-    void deleteOrder(Long id);
+    void deleteOrder(Long id) throws Exception;
 
-    List<OrderResponse> getAllOrders(Long userId);
+    List<OrderResponse> getAllOrdersOfUser(Long userId);
 
+    List<OrderResponse> getAllOrders();
 
 }
