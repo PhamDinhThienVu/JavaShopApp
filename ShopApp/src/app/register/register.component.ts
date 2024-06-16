@@ -1,7 +1,8 @@
 import { Component, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import {HttpClient, HttpHeaders} from '@angular/common/http'
 import {Router} from '@angular/router'
+import { UserService } from '../services/user.service';
+import { RegisterDTO } from '../dtos/register.dto';
 
 @Component({
   selector: 'app-register',
@@ -21,8 +22,8 @@ export class RegisterComponent {
   dateOfBirth: Date;
   //Inject dependencies http, router
   constructor(
-    private http: HttpClient, 
-    private router: Router
+    private router: Router,
+    private userService: UserService
   ){
     this.phone = "11223344";
     this.password= "123456";
@@ -47,10 +48,9 @@ export class RegisterComponent {
       `fullName: ${this.fullname}` + 
       `Date Of Birth: ${this.dateOfBirth}` + 
       `isAccepted: ${this.isAccepted}`;
-    
     alert(message);
-    const apiURL = "http://localhost:8088/api/v1/users/register";
-    const registerData = {
+    
+    const registerDTO:RegisterDTO = {
       "fullname": this.fullname,
       "phone_number": this.phone,
       "address": this.address,
@@ -61,10 +61,8 @@ export class RegisterComponent {
       "google_account_id": 0,
       "role_id": 2 //User role
     }
-    const headers = new HttpHeaders({
-       'Content-Type': 'application/json'
-    });
-    this.http.post(apiURL, registerData, {headers: headers})
+    
+    this.userService.register(registerDTO)
     .subscribe({
       next: (response: any) => {
         debugger
